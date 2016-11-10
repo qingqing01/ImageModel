@@ -20,7 +20,7 @@ def hook(settings, image_size, crop_size, color, num_class, **kwargs):
     settings.img_size = crop_size
     settings.crop_size = crop_size
     settings.color = color  # default is color
-    settings.is_train = 0
+    settings.is_train = 1
 
     if settings.color:
         settings.img_input_size = settings.crop_size * settings.crop_size * 3
@@ -49,38 +49,36 @@ def hook(settings, image_size, crop_size, color, num_class, **kwargs):
 def processPIL(settings, file_list):
     with open(file_list, 'r') as file_names:
         lines = [line.strip() for line in file_names]
-    random.shuffle(lines)
-    
-    for line in lines:
-        img_path, lab = line.strip().split('\t')
-        img = Image.open(img_path)
-        img.load()
-        img = image_util.resize_image2(img, settings.resize_size)
-        img = np.array(img)
-        if len(img.shape) == 3:
-            img = np.swapaxes(img, 1, 2)
-            img = np.swapaxes(img, 1, 0)
-        img = img[[2,1,0],:,:]
-        img_feat= image_util.preprocessImg(settings, img)
-        yield img_feat.astype('float32'), int(lab.strip())
+        random.shuffle(lines)
+        for line in lines:
+            img_path, lab = line.strip().split('\t')
+            img = Image.open(img_path)
+            img.load()
+            img = image_util.resize_image2(img, settings.resize_size)
+            img = np.array(img)
+            if len(img.shape) == 3:
+                img = np.swapaxes(img, 1, 2)
+                img = np.swapaxes(img, 1, 0)
+            img = img[[2,1,0],:,:]
+            img = image_util.preprocessImg(settings, img)
+            yield img.astype('float32'), int(lab.strip())
 
 @provider(init_hook=hook,min_pool_size=0)
 def processScipy(settings, file_list):
     with open(file_list, 'r') as file_names:
         lines = [line.strip() for line in file_names]
-    random.shuffle(lines)
-
-    for line in lines:
-        img_path, lab = line.strip().split(' ')
-        img = imread(img_path);
-        img = imresize(img, [256, 256])
-        imsave('temp_resized.jpg', img) # just to simulate the batch process
-        dat = open('temp_resized.jpg', 'rb').read()
-        img = Image.open(StringIO.StringIO(dat))
-        img = np.array(img)
-        if len(img.shape) == 3:
-            img = np.swapaxes(img, 1, 2)
-            img = np.swapaxes(img, 1, 0)
-        img = img[[2,1,0],:,:]
-        img_feat= image_util.preprocessImg(settings, img)
-        yield img_feat.astype('float32'), int(lab.strip())
+        random.shuffle(lines)
+        for line in lines:
+            img_path, lab = line.strip().split(' ')
+            img = imread(img_path);
+            img = imresize(img, [256, 256])
+            imsave('temp_resized.jpg', img) # just to simulate the batch process
+            dat = open('temp_resized.jpg', 'rb').read()
+            img = Image.open(StringIO.StringIO(dat))
+            img = np.array(img)
+            if len(img.shape) == 3:
+                img = np.swapaxes(img, 1, 2)
+                img = np.swapaxes(img, 1, 0)
+            img = img[[2,1,0],:,:]
+            img_feat= image_util.preprocessImg(settings, img)
+            yield img_feat.astype('float32'), int(lab.strip())

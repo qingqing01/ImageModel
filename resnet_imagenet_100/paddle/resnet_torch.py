@@ -21,13 +21,14 @@ paper: https://arxiv.org/abs/1512.03385
 args={
     'mean_value': [103.939,116.779,123.68],
     'image_size': 256, 'crop_size': 224, 'color': True}
-define_py_data_sources2('dataset_100/train.list',
-                        'dataset_100/test.list',
+define_py_data_sources2('data/train.list',
+                        'data/test.list',
                         module="provider",
                         obj="processPIL",
                         args=args)
 
 layer_num = 50
+num_class = 100
 batch_size = 128
 learning_rate = 0.1 / batch_size
 momentum = 0.9
@@ -40,7 +41,6 @@ Settings(
     batch_size=batch_size,
     learning_rate=learning_rate,
 
-    # set the appropriate parameters according your schedule
     learning_method='momentum',
     learning_rate_decay_a=0.1,
     learning_rate_decay_b=128660 * 32,
@@ -69,7 +69,6 @@ def conv_bn_layer(name, input, filter_size, num_filters,
     return batch_norm_layer(name=name + "_bn",
                             input=tmp,
                             act=active_type)
-                            #use_global_stats=is_test)
 
 
 def bottleneck_block(name, input, num_filters1, num_filters2):
@@ -250,7 +249,7 @@ def deep_res_net(res2_num=3, res3_num=4, res4_num=6, res5_num=3):
 
     output = fc_layer(name='output',
                       input=tmp,
-                      size=100,
+                      size=num_class,
                       param_attr=ParamAttr(initial_std=0.01),
                       bias_attr=ParamAttr(initial_std=0., l2_rate=0.),
                       act=SoftmaxActivation())

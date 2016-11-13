@@ -15,12 +15,12 @@ logging.basicConfig(
 logger = logging.getLogger('paddle_data_provider')
 logger.setLevel(logging.INFO)
 
-def hook(settings, image_size, crop_size, color, **kwargs):
+def hook(settings, image_size, crop_size, color, is_train, **kwargs):
     settings.resize_size = image_size
     settings.img_size = crop_size
     settings.crop_size = crop_size
     settings.color = color  # default is color
-    settings.is_train = 1
+    settings.is_train = is_train
 
     if settings.color:
         settings.img_input_size = settings.crop_size * settings.crop_size * 3

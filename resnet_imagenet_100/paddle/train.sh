@@ -17,17 +17,16 @@ set -e
 # data add:
 # hdfs://nmg01-mulan-hdfs.dmop.baidu.com:54310/app/idl/users/dl/dangqingqing/data/dataset_100
 
-config=resnet.py
+config=resnet_torch.py
 
 paddle train \
   --config=$config \
   --log_period=20 \
   --test_all_data_in_one_period=1 \
   --use_gpu=1 \
-  --gpu_id=4 \
   --test_period=400 \
   --trainer_count=4 \
-  --num_passes=100 \
+  --num_passes=106 \
   --save_dir=./output \
   --cudnn_dir=/home/dangqingqing/tools/cudnn-5.1/lib64 \
   >train.log 2>&1 &
